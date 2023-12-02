@@ -114,8 +114,8 @@ public class UserInputParser
 
 
 
-        List<string> userInputOperacije = new List<string>(userInput.Split(" "));
-        if (userInputOperacije.Count == 1 && (!userInputOperacije[0].Contains("^") && !userInputOperacije[0].Contains("!")))
+        List<string> userInputOperacije = new(userInput.Split(" "));
+        if (userInputOperacije.Count == 1 && (!userInputOperacije[0].Contains('^') && !userInputOperacije[0].Contains('!')))
         {
             Console.WriteLine($"{userInput}");
             return (int)returnFlagsParser.softExit;
@@ -124,18 +124,18 @@ public class UserInputParser
         {
             string imeVar = userInputOperacije[1];
             Console.Write($"Upiši vrijednost nove varijable \"{imeVar}\": ");
-            Varijabla noviVar = new Varijabla(imeVar, double.Parse(Console.ReadLine() + ""));
+            Varijabla noviVar = new(imeVar, double.Parse(Console.ReadLine() + ""));
             varijable.Add(noviVar);
 
             return (int)returnFlagsParser.softExit;
         }
-        int maxIndex = userInputOperacije.Count();
+        int maxIndex = userInputOperacije.Count;
         int brojOperacija = maxIndex / 2;
         int brojOperanda = maxIndex / 2 + 1;
 
-        if (brojOperacija + brojOperanda != userInputOperacije.Count()) throw new InvalidOperationException("Zbroj operanda i operacija nije jednak broju svih elemenata!");
+        if (brojOperacija + brojOperanda != userInputOperacije.Count) throw new InvalidOperationException("Zbroj operanda i operacija nije jednak broju svih elemenata!");
 
-        List<PrioritetOperacija> Operacije = new List<PrioritetOperacija>();
+        List<PrioritetOperacija> Operacije = new();
 
         for (int i = 0; i < maxIndex; i++)
         {
@@ -164,11 +164,11 @@ public class UserInputParser
                     break;
                 default:
                     {
-                        if (operacija.Contains("^"))
+                        if (operacija.Contains('^'))
                         {
                             Operacije.Add(IspuniListuPrioriteta(i, prioritetPOT, '^'));
                         }
-                        else if (operacija.Contains("!"))
+                        else if (operacija.Contains('!'))
                         {
                             ChangeColor.RedBGLine("Računanje faktorijela nije implementirano!\n");
                             Debug.Assert(false);
@@ -186,7 +186,7 @@ public class UserInputParser
         }
         else return (int)returnFlagsParser.err;
 
-        List<Varijabla> varijableCopy = new List<Varijabla>(varijable);
+        List<Varijabla> varijableCopy = new(varijable);
 
         if (Operacije[0].operacija == '+')
         {
@@ -221,7 +221,7 @@ public class UserInputParser
             }
             else // var-only
             {
-                Varijabla tempVar = new Varijabla($"TMP{tempInt}", A.element + B.element);
+                Varijabla tempVar = new($"TMP{tempInt}", A.element + B.element);
                 varijableCopy.Add(tempVar);
 
                 userInputOperacije[Operacije[0].index + 1] = $"TMP{tempInt}"; //Sprema ime TMP varijable za kasniju upotrebu
@@ -272,7 +272,7 @@ public class UserInputParser
             }
             else // var-only
             {
-                Varijabla tempVar = new Varijabla($"TMP{tempInt}", A.element - B.element);
+                Varijabla tempVar = new($"TMP{tempInt}", A.element - B.element);
                 varijableCopy.Add(tempVar);
 
                 userInputOperacije[Operacije[0].index + 1] = $"TMP{tempInt}"; //Sprema ime TMP varijable za kasniju upotrebu
@@ -370,14 +370,14 @@ public class UserInputParser
                 }
                 else if (IsNumber(posljeOperacije) && A != null)
                 {
-                    Varijabla tempVar = new Varijabla($"TMP{tempInt}", Math.Pow(A.element, double.Parse(posljeOperacije)));
+                    Varijabla tempVar = new($"TMP{tempInt}", Math.Pow(A.element, double.Parse(posljeOperacije)));
                     varijableCopy.Add(tempVar);
 
                     userInputOperacije[Operacije[0].index] = $"TMP{tempInt}";
                 }
                 else if (IsNumber(prijeOperacije) && B != null)
                 {
-                    Varijabla tempVar = new Varijabla($"TMP{tempInt}", Math.Pow(double.Parse(prijeOperacije), B.element));
+                    Varijabla tempVar = new($"TMP{tempInt}", Math.Pow(double.Parse(prijeOperacije), B.element));
                     varijableCopy.Add(tempVar);
 
                     userInputOperacije[Operacije[0].index] = $"TMP{tempInt}";
@@ -398,9 +398,9 @@ public class UserInputParser
             }
             userInput = "";
 
-            if (razdvajanjeNaBazuIEksponent.Count() > 2)
+            if (razdvajanjeNaBazuIEksponent.Length > 2)
             {
-                for (int i = 2; i < razdvajanjeNaBazuIEksponent.Count(); i++)
+                for (int i = 2; i < razdvajanjeNaBazuIEksponent.Length; i++)
                 {
                     userInputOperacije[Operacije[0].index] += $"^{razdvajanjeNaBazuIEksponent[i]}";
                 }
@@ -411,7 +411,7 @@ public class UserInputParser
                 if (i == maxIndex - 1) userInput += userInputOperacije[i];
                 else userInput += userInputOperacije[i] + " ";
             }
-            if (razdvajanjeNaBazuIEksponent.Count() == 2)
+            if (razdvajanjeNaBazuIEksponent.Length == 2)
             {
                 Operacije.RemoveAt(0);
             }
@@ -440,7 +440,7 @@ public class UserInputParser
                 }
                 else if (A == null && IsNumber(posljeOperacije))
                 {
-                    Varijabla tempVar = new Varijabla(prijeOperacije, double.Parse(posljeOperacije));
+                    Varijabla tempVar = new(prijeOperacije, double.Parse(posljeOperacije));
 
                     varijable.Add(tempVar);
                     Operacije.RemoveAt(0);
@@ -450,7 +450,7 @@ public class UserInputParser
                     throw new ArgumentException($"Nije pronađena varijabla {posljeOperacije}!");
                 else if (A == null)
                 {
-                    Varijabla tempVar = new Varijabla(prijeOperacije, B.element);
+                    Varijabla tempVar = new(prijeOperacije, B.element);
                     varijable.Add(tempVar);
 
                     Operacije.RemoveAt(0);
@@ -477,7 +477,7 @@ public class UserInputParser
                     if (!A.ime.Contains("TMP"))
                         if (ReDefinirajVarijablu(A, varijable))
                         {
-                            Varijabla Rj = new Varijabla(imeNoveVar, B.element);
+                            Varijabla Rj = new(imeNoveVar, B.element);
                             varijable.Remove(A);
                             varijable.Add(Rj);
                             return (int)returnFlagsParser.exitResultStored;
@@ -491,7 +491,7 @@ public class UserInputParser
 
         //Console.WriteLine(userInput);
         int rfll = (int)returnFlagsParser.normal;
-        if (Operacije.Count() > 0)
+        if (Operacije.Count > 0)
         {
             rfll = StringToKalkulatorParser(userInput, varijableCopy, tempInt + 1); // Return from lower layer
         }
@@ -503,15 +503,15 @@ public class UserInputParser
         {
             if (varijableCopy.Count > 0)
             {
-                varijable.Add(varijableCopy[varijableCopy.Count - 1]);
+                varijable.Add(varijableCopy[^1]);
             }
         }
 
         if (rfll == (int)returnFlagsParser.exitResultStored)
         {
-            var NameColTest = varijable.FindPerName(varijableCopy[varijableCopy.Count - 1].ime);
+            var NameColTest = varijable.FindPerName(varijableCopy[^1].ime);
             if (NameColTest != null) varijable.Remove(NameColTest);
-            varijable.Add(varijableCopy[varijableCopy.Count - 1]);
+            varijable.Add(varijableCopy[^1]);
         }
 
         if (IsNumber(userInput)) Console.WriteLine(userInput);
@@ -523,7 +523,7 @@ public class UserInputParser
 
         if (tempInt == 0 && !IsNumber(userInput) && print)
         {
-            Varijabla A = varijableCopy[varijableCopy.Count - 1];
+            Varijabla A = varijableCopy[^1];
             if (varijable.FindPerName(A.ime) != null)
             {
                 Console.WriteLine($"{A.element}");
@@ -538,7 +538,7 @@ public class UserInputParser
         {
             if (varijableCopy.Count > 0)
             {
-                varijable.Remove(varijableCopy[varijableCopy.Count - 1]);
+                varijable.Remove(varijableCopy[^1]);
             }
         }
 
@@ -548,10 +548,12 @@ public class UserInputParser
 
     private static PrioritetOperacija IspuniListuPrioriteta(int index, int prioritet, char operacija)
     {
-        PrioritetOperacija prioritetOperacija = new PrioritetOperacija();
-        prioritetOperacija.prioritet = prioritet;
-        prioritetOperacija.index = index;
-        prioritetOperacija.operacija = operacija;
+        PrioritetOperacija prioritetOperacija = new()
+        {
+            prioritet = prioritet,
+            index = index,
+            operacija = operacija
+        };
 
         return prioritetOperacija;
     }

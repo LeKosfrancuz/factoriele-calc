@@ -16,7 +16,7 @@ public static class CommandColor
         if (userInput == "") Console.Write("Upiši \"?\" za pomoc\r");
 
         (int x_pomak, int y_pomak) = Console.GetCursorPosition();
-        x_pomak = Console.CursorLeft;
+        //int x_pomak = Console.CursorLeft;
         Console.SetCursorPosition(x_pomak, y_pomak - 1);
 
         if (userInput == "") return userInput;
@@ -25,9 +25,7 @@ public static class CommandColor
 
         //Console.Write("\x1b[1A\r\x1b[2K\r>");
 
-        List<BojaOperacija> userInputOperandi = new List<BojaOperacija> { AddOperacija(0, "0") };
-        userInputOperandi.RemoveAt(0);
-        if (userInputOperandi.Count > 0) throw new InvalidProgramException("Prazno polje operanada nije prazno!");
+        List<BojaOperacija> userInputOperandi = new();
 
         string tempInput = "";
         int brojOperanada = 0;
@@ -37,11 +35,31 @@ public static class CommandColor
         {
             tempInput += userInput[i];
 
-            if (tempInput == "+" || tempInput == "-" || tempInput == "*" || tempInput == "/" || tempInput == "^" || tempInput == "!" || tempInput == "=")
+            if (tempInput == "+" || tempInput == "*" || tempInput == "/" || tempInput == "^" || tempInput == "!" || tempInput == "=")
             {
                 userInputOperandi.Add(AddOperacija((int)ConsoleColor.White, tempInput));
                 brojOperanada++;
                 tempInput = "";
+                continue;
+            } else if (tempInput == "-")
+            {
+                for (int j = 1; j < userInput.Length && j <= i; j++)
+                {
+                    char prevOperator = userInput[i - j];
+                    if (prevOperator == ' ') continue;
+                    
+                    if (prevOperator == '+' || prevOperator == '*' || prevOperator == '/' || prevOperator == '-'
+                        || prevOperator == '^' || prevOperator == '!' || prevOperator == '=' || userInput[(i - j)..i].Length == 0)
+                    {
+                        break;
+                    }
+
+                    
+                    userInputOperandi.Add(AddOperacija((int)ConsoleColor.White, tempInput));
+                    brojOperanada++;
+                    tempInput = "";
+                    
+                }
                 continue;
             }
 
@@ -66,16 +84,20 @@ public static class CommandColor
                     //Ako varijabla ne postoji, ovisi o mjestu u komandi obojaj u zeleno(spremanje u novu) ili crveno(računanje s novom)
                     var tempVar = varijable.FindPerName(tempInput);
                     if (tempVar == null || UserInputParser.IsNumber(tempInput))
+                    {
                         if (UserInputParser.IsNumber(tempInput))
                             //Ako je broj -> obojaj u cyane
                             userInputOperandi.Add(AddOperacija((int)ConsoleColor.Cyan, tempInput));
-                        else if (tempInput == userInput.Split("=")[0].Split(" ")[0])
+                        else if (userInput.Split("=").Length > 1 && tempInput == userInput.Split("=")[0].Split(" ")[0])
                             userInputOperandi.Add(AddOperacija((int)ConsoleColor.Green, tempInput));
                         else
                             userInputOperandi.Add(AddOperacija((int)ConsoleColor.Red, tempInput));
+                    }
                     else
+                    {
                         //Ime postojece matrice obojaj u žutu
                         userInputOperandi.Add(AddOperacija((int)ConsoleColor.Yellow, tempInput));
+                    }
                 }
 
                 brojOperanada++;
@@ -84,8 +106,7 @@ public static class CommandColor
 
         }
 
-        List<BojaOperacija> outputString = new List<BojaOperacija> { AddOperacija(0, "0") };
-        outputString.RemoveAt(0);
+        List<BojaOperacija> outputString = new();
 
         for (int i = 0; i < userInputOperandi.Count; i++)
         {
