@@ -51,6 +51,12 @@ public static class CommandColor
                     if (prevOperator == '+' || prevOperator == '*' || prevOperator == '/' || prevOperator == '-'
                         || prevOperator == '^' || prevOperator == '!' || prevOperator == '=' || userInput[(i - j)..i].Length == 0)
                     {
+                        int k = i+1;
+                        if (i + 1 < userInput.Length)
+                        {
+                            while (userInput[(i + 1)..k].Replace(" ", "").Equals("") && k < userInput.Length) k++;
+                            i = k - 2;
+                        }
                         break;
                     }
 
@@ -58,7 +64,7 @@ public static class CommandColor
                     userInputOperandi.Add(AddOperacija((int)ConsoleColor.White, tempInput));
                     brojOperanada++;
                     tempInput = "";
-                    
+                    break;
                 }
                 continue;
             }

@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-
+using System.Runtime;
 
 namespace InputParsing;
 
@@ -55,7 +55,7 @@ public class UserInputParser
                           "\"{3}\" \n" +
                           "\t- Očisti ekran\n\n",
                           UserInputParser.defineVariable, UserInputParser.helpMeni, UserInputParser.exitFromCalc, UserInputParser.clScr);
-        Console.WriteLine("Operacije \"A + B\", \"A - B\", \"A * B\", \"A = B\"");
+        Console.WriteLine("Operacije \"A + B\", \"A - B\", \"A * B\", \"A / B\", \"A = B\"");
         Console.WriteLine("\t- Moraju imati 2 ili više operanda npr (A = B, A + B, ...)");
         Console.WriteLine("\t- Operandi su imena varijabli i brojevi (numericke vrjednosti)");
         //Console.WriteLine("\t- Ove operacije MORAJU se pisati sa razmakom oko njih npr (A_=_B) gdje je \"_\" razmak\n");
@@ -108,6 +108,7 @@ public class UserInputParser
         int prioritetPL = 5;
         int prioritetMIN = 5;
         int prioritetMUL = 4;
+        int prioritetDIV = 4;
         // TODO: Zagrade
         int prioritetFAC = 2;
         int prioritetPOT = 1;
@@ -117,8 +118,17 @@ public class UserInputParser
         List<string> userInputOperacije = new(userInput.Split(" "));
         if (userInputOperacije.Count == 1 && (!userInputOperacije[0].Contains('^') && !userInputOperacije[0].Contains('!')))
         {
-            Console.WriteLine($"{userInput}");
-            return (int)returnFlagsParser.softExit;
+            if (tempInt == 0 && !IsNumber(userInput))
+            {
+                var A = varijable.FindPerName(userInput) ?? throw new ArgumentException($"Nije pronađena varijabla {userInput}!");
+                Console.WriteLine($"{A.element}");
+                return (int)returnFlagsParser.normal;
+            }
+            else
+            {
+                Console.WriteLine($"{userInput}");
+                return (int)returnFlagsParser.softExit;
+            }
         }
         if (userInputOperacije[0].ToUpper() == defineVariable)
         {
@@ -152,6 +162,10 @@ public class UserInputParser
                         Operacije.Add(IspuniListuPrioriteta(i, prioritetMUL, '*'));
                     }
                     break;
+                case "/":
+                    {
+                        Operacije.Add(IspuniListuPrioriteta(i, prioritetDIV, '/'));
+                    } break;
                 case "+":
                     {
                         Operacije.Add(IspuniListuPrioriteta(i, prioritetPL, '+'));
@@ -197,8 +211,7 @@ public class UserInputParser
             var B = varijableCopy.FindPerName(posljeOperacije + "");
             if (A == null || B == null)
             {
-                // TODO: Istražit zašto koristim index a ne `prijeOperacije`
-                if (IsNumber(userInputOperacije[Operacije[0].index - 1]) && IsNumber(posljeOperacije))
+                if (IsNumber(prijeOperacije) && IsNumber(posljeOperacije))
                 {
                     double rj = double.Parse(prijeOperacije) + double.Parse(posljeOperacije);
                     userInputOperacije[Operacije[0].index + 1] = $"{rj}";
@@ -248,8 +261,7 @@ public class UserInputParser
             var B = varijableCopy.FindPerName(posljeOperacije + "");
             if (A == null || B == null)
             {
-                // TODO: Istražit zašto koristim index a ne `prijeOperacije`
-                if (IsNumber(userInputOperacije[Operacije[0].index - 1]) && IsNumber(posljeOperacije))
+                if (IsNumber(prijeOperacije) && IsNumber(posljeOperacije))
                 {
                     double rj = double.Parse(prijeOperacije) - double.Parse(posljeOperacije);
                     userInputOperacije[Operacije[0].index + 1] = $"{rj}";
@@ -311,7 +323,7 @@ public class UserInputParser
 
                 }
                 else if (A == null && !IsNumber(prijeOperacije) || B == null && !IsNumber(posljeOperacije))
-                    throw new ArgumentException($"Jedna od varijabli nije definirana (\"{prijeOperacije} + {posljeOperacije}\")");
+                    throw new ArgumentException($"Jedna od varijabli nije definirana (\"{prijeOperacije} * {posljeOperacije}\")");
             }
             
             if (!numOnly)// var-only
@@ -325,7 +337,61 @@ public class UserInputParser
                 else if (A != null && B != null)
                     tempVar = new Varijabla($"TMP{tempInt}", A.element * B.element);
                 else
-                    throw new ArgumentException($"Niti jedna od varijabli nije definirana (\"{prijeOperacije} + {posljeOperacije}\")");
+                    throw new ArgumentException($"Niti jedna od varijabli nije definirana (\"{prijeOperacije} * {posljeOperacije}\")");
+
+                varijableCopy.Add(tempVar);
+
+                userInputOperacije[Operacije[0].index + 1] = $"TMP{tempInt}"; //Sprema ime TMP varijable za kasniju upotrebu
+                userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
+                userInputOperacije.RemoveAt(Operacije[0].index - 1);
+            }
+
+            userInput = "";
+
+            for (int i = 0; i < maxIndex - 2; i++)      //Rekonstruira Input s imenima novih varijabli
+            {
+                if (i == maxIndex - 3) userInput += userInputOperacije[i];
+                else userInput += userInputOperacije[i] + " ";
+            }
+            Operacije.RemoveAt(0);
+
+        }
+        else if (Operacije[0].operacija == '/')
+        {
+            string prijeOperacije = userInputOperacije[Operacije[0].index - 1];
+            string posljeOperacije = userInputOperacije[Operacije[0].index + 1];
+            bool numOnly = false;
+
+            var A = varijableCopy.FindPerName(prijeOperacije + "");
+            var B = varijableCopy.FindPerName(posljeOperacije + "");
+            if (A == null || B == null)
+            {
+                if (IsNumber(prijeOperacije) && IsNumber(posljeOperacije))
+                {
+                    double rj = double.Parse(prijeOperacije) / double.Parse(posljeOperacije);
+                    userInputOperacije[Operacije[0].index + 1] = $"{rj}";
+                    userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
+                    userInputOperacije.RemoveAt(Operacije[0].index - 1);
+                    print = false;
+                    numOnly = true;
+
+                }
+                else if (A == null && !IsNumber(prijeOperacije) || B == null && !IsNumber(posljeOperacije))
+                    throw new ArgumentException($"Jedna od varijabli nije definirana (\"{prijeOperacije} / {posljeOperacije}\")");
+            }
+
+            if (!numOnly)// var-only
+            {
+                Varijabla tempVar;
+
+                if (IsNumber(posljeOperacije) && A != null)
+                    tempVar = new Varijabla($"TMP{tempInt}", A.element / double.Parse(posljeOperacije));
+                else if (IsNumber(prijeOperacije) && B != null)
+                    tempVar = new Varijabla($"TMP{tempInt}", double.Parse(prijeOperacije) / B.element);
+                else if (A != null && B != null)
+                    tempVar = new Varijabla($"TMP{tempInt}", A.element / B.element);
+                else
+                    throw new ArgumentException($"Niti jedna od varijabli nije definirana (\"{prijeOperacije} / {posljeOperacije}\")");
 
                 varijableCopy.Add(tempVar);
 
@@ -446,6 +512,30 @@ public class UserInputParser
                     Operacije.RemoveAt(0);
                     return (int)returnFlagsParser.exitResultStored;
                 }
+                else if (A != null && IsNumber(posljeOperacije))
+                {
+                    if (A.element == double.Parse(posljeOperacije))
+                    {
+                        Console.Write("Lijeva i desna strana su jednake! ");
+                        ChangeColor.GreenBGLine("TRUE");
+                        Operacije.RemoveAt(0);
+                        return (int)returnFlagsParser.JednadzbaTrue;
+                    }
+
+                    Console.Write("Lijeva i desna strana nisu jednake! ");
+                    ChangeColor.RedBGLine("FALSE");
+                    Operacije.RemoveAt(0);
+                    string imeNoveVar = A.ime;
+                    if (!A.ime.Contains("TMP"))
+                        if (ReDefinirajVarijablu(A, varijable))
+                        {
+                            Varijabla Rj = new(imeNoveVar, double.Parse(posljeOperacije));
+                            varijable.Remove(A);
+                            varijable.Add(Rj);
+                            return (int)returnFlagsParser.exitResultStored;
+                        }
+                    return (int)returnFlagsParser.normal;
+                }
                 else if (B == null)
                     throw new ArgumentException($"Nije pronađena varijabla {posljeOperacije}!");
                 else if (A == null)
@@ -459,7 +549,7 @@ public class UserInputParser
             }
 
 
-            if (A != null)
+            if (A != null && B != null)
             {
                 if (A.element == B.element)
                 {
