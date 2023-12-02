@@ -1,25 +1,24 @@
-﻿using System.Diagnostics;
-using InputParsing;
+﻿using InputParsing;
 
 internal class Kalkulator
 {
     static void Main()
     {
-        List<Varijabla> Varijable = new();
+        List<Varijabla> varijable = new();
         
 
         ///                         KOMANDNA LINIJA
 
-        int exitProgram = 1;
+        int exitCode = (int)returnFlagsParser.normal;
 
         
         ChangeColor.GrayTX("Dobro došli u ");
         ChangeColor.WhiteTX("Kalulator za faktoriele\n");
         ChangeColor.GrayTX("Upišite HELP za listu komandi\n");
        
-        Console.CancelKeyPress += new ConsoleCancelEventHandler(ctrlCRukovanje);
+        Console.CancelKeyPress += new ConsoleCancelEventHandler(CtrlCRukovanje);
 
-        while (exitProgram != (int)returnFlagsParser.SaveToFile && exitProgram != (int)returnFlagsParser.exitProgram)
+        while (UserInputParser.ShouldExit(exitCode))
         {
             ChangeColor.WhiteTX(">"); // prompt
             try
@@ -27,10 +26,10 @@ internal class Kalkulator
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 string userInput = Console.ReadLine() + "";
 
-                userInput = CommandColor.LineColoring(userInput, Varijable);
+                userInput = CommandColor.LineColoring(userInput, varijable);
 
                 Console.ForegroundColor = ConsoleColor.White;
-                exitProgram = UserInputParser.StringToKalkulatorParser(userInput, Varijable);
+                exitCode = UserInputParser.StringToKalkulatorParser(userInput, varijable);
             }
             catch (ArgumentException e) { ChangeColor.RedTX("Greška: "); Console.WriteLine(e.Message); }
             catch (InvalidOperationException e) { ChangeColor.RedTX("Greška: "); Console.WriteLine(e.Message); }
@@ -55,7 +54,7 @@ internal class Kalkulator
         Thread.Sleep(500);
     }
 
-    protected static void ctrlCRukovanje(object sender, ConsoleCancelEventArgs args)
+    protected static void CtrlCRukovanje(object sender, ConsoleCancelEventArgs args)
     {
 
         Console.WriteLine("\nProgram je prisilno zaustavljen");

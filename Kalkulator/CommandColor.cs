@@ -8,7 +8,7 @@ namespace InputParsing;
 
 public static class CommandColor
 {
-    public static string LineColoring(string userInput, List<Varijabla> Varijable)
+    public static string LineColoring(string userInput, List<Varijabla> varijable)
     {
         Console.ForegroundColor = ConsoleColor.White;
         Console.BackgroundColor = ConsoleColor.Black;
@@ -64,7 +64,7 @@ public static class CommandColor
                 else
                 {
                     //Ako varijabla ne postoji, ovisi o mjestu u komandi obojaj u zeleno(spremanje u novu) ili crveno(računanje s novom)
-                    var tempVar = Varijable.FindPerName(tempInput);
+                    var tempVar = varijable.FindPerName(tempInput);
                     if (tempVar == null || UserInputParser.IsNumber(tempInput))
                         if (UserInputParser.IsNumber(tempInput))
                             //Ako je broj -> obojaj u cyane

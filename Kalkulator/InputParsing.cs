@@ -19,13 +19,13 @@ public class Varijabla
 
 public static class VarijablaListExtention
 {
-    public static Varijabla? FindPerName(this List<Varijabla> Varijable, string itemName)
+    public static Varijabla? FindPerName(this List<Varijabla> varijable, string itemName)
     {
-        for (int i = 0; i < Varijable.Count; i++)
+        for (int i = 0; i < varijable.Count; i++)
         {
-            if (Varijable[i].ime == itemName)
+            if (varijable[i].ime == itemName)
             {
-                return Varijable[i];
+                return varijable[i];
             }
         }
 
@@ -35,6 +35,7 @@ public static class VarijablaListExtention
 
 public class UserInputParser
 {
+    // Mora biti definirano VELIKIM slovima!
     public const string exitFromCalc = "Q";
     public const string helpMeni = "HELP";
     public const string defineVariable = "DEF";
@@ -71,8 +72,12 @@ public class UserInputParser
         return;
     }
 
+    public static bool ShouldExit(int exitCode)
+    {
+        return exitCode != (int)returnFlagsParser.SaveToFile && exitCode != (int)returnFlagsParser.exitProgram;
+    }
 
-    public static int StringToKalkulatorParser(string userInput, List<Varijabla> Varijable, int tempInt = 0)
+    public static int StringToKalkulatorParser(string userInput, List<Varijabla> varijable, int tempInt = 0)
     {
         bool print = true;
         if (userInput == null) return (int)returnFlagsParser.err;
@@ -120,7 +125,7 @@ public class UserInputParser
             string imeVar = userInputOperacije[1];
             Console.Write($"Upiši vrijednost nove varijable \"{imeVar}\": ");
             Varijabla noviVar = new Varijabla(imeVar, double.Parse(Console.ReadLine() + ""));
-            Varijable.Add(noviVar);
+            varijable.Add(noviVar);
 
             return (int)returnFlagsParser.softExit;
         }
@@ -181,16 +186,15 @@ public class UserInputParser
         }
         else return (int)returnFlagsParser.err;
 
-        List<Varijabla> VarijableCopy = new List<Varijabla>(Varijable);
+        List<Varijabla> varijableCopy = new List<Varijabla>(varijable);
 
         if (Operacije[0].operacija == '+')
         {
             string prijeOperacije = userInputOperacije[Operacije[0].index - 1];
             string posljeOperacije = userInputOperacije[Operacije[0].index + 1];
-            bool numOnly = false;
 
-            var A = VarijableCopy.FindPerName(prijeOperacije + "");
-            var B = VarijableCopy.FindPerName(posljeOperacije + "");
+            var A = varijableCopy.FindPerName(prijeOperacije + "");
+            var B = varijableCopy.FindPerName(posljeOperacije + "");
             if (A == null || B == null)
             {
                 // TODO: Istražit zašto koristim index a ne `prijeOperacije`
@@ -200,7 +204,6 @@ public class UserInputParser
                     userInputOperacije[Operacije[0].index + 1] = $"{rj}";
                     userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
                     userInputOperacije.RemoveAt(Operacije[0].index - 1);
-                    numOnly = true;
                     print = false;
                 }
                 else if (IsNumber(prijeOperacije) || IsNumber(posljeOperacije))
@@ -209,7 +212,6 @@ public class UserInputParser
                     userInputOperacije[Operacije[0].index + 1] = $"{rj}";
                     userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
                     userInputOperacije.RemoveAt(Operacije[0].index - 1);
-                    numOnly = true;
                     print = false;
                 }
                 else
@@ -217,12 +219,10 @@ public class UserInputParser
                     throw new ArgumentException($"Jedna od varijabli nije definirana (\"{prijeOperacije} + {posljeOperacije}\")");
                 }
             }
-
-
-            if (!numOnly)
+            else // var-only
             {
                 Varijabla tempVar = new Varijabla($"TMP{tempInt}", A.element + B.element);
-                VarijableCopy.Add(tempVar);
+                varijableCopy.Add(tempVar);
 
                 userInputOperacije[Operacije[0].index + 1] = $"TMP{tempInt}"; //Sprema ime TMP varijable za kasniju upotrebu
                 userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
@@ -243,10 +243,9 @@ public class UserInputParser
         {
             string prijeOperacije = userInputOperacije[Operacije[0].index - 1];
             string posljeOperacije = userInputOperacije[Operacije[0].index + 1];
-            bool numOnly = false;
 
-            var A = VarijableCopy.FindPerName(prijeOperacije + "");
-            var B = VarijableCopy.FindPerName(posljeOperacije + "");
+            var A = varijableCopy.FindPerName(prijeOperacije + "");
+            var B = varijableCopy.FindPerName(posljeOperacije + "");
             if (A == null || B == null)
             {
                 // TODO: Istražit zašto koristim index a ne `prijeOperacije`
@@ -256,7 +255,6 @@ public class UserInputParser
                     userInputOperacije[Operacije[0].index + 1] = $"{rj}";
                     userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
                     userInputOperacije.RemoveAt(Operacije[0].index - 1);
-                    numOnly = true;
                     print = false;
                 }
                 else if (IsNumber(prijeOperacije) || IsNumber(posljeOperacije))
@@ -265,7 +263,6 @@ public class UserInputParser
                     userInputOperacije[Operacije[0].index + 1] = $"{rj}";
                     userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
                     userInputOperacije.RemoveAt(Operacije[0].index - 1);
-                    numOnly = true;
                     print = false;
                 }
                 else
@@ -273,12 +270,10 @@ public class UserInputParser
                     throw new ArgumentException($"Jedna od varijabli nije definirana (\"{prijeOperacije} - {posljeOperacije}\")");
                 }
             }
-
-
-            if (!numOnly)
+            else // var-only
             {
                 Varijabla tempVar = new Varijabla($"TMP{tempInt}", A.element - B.element);
-                VarijableCopy.Add(tempVar);
+                varijableCopy.Add(tempVar);
 
                 userInputOperacije[Operacije[0].index + 1] = $"TMP{tempInt}"; //Sprema ime TMP varijable za kasniju upotrebu
                 userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
@@ -301,8 +296,8 @@ public class UserInputParser
             string posljeOperacije = userInputOperacije[Operacije[0].index + 1];
             bool numOnly = false;
 
-            var A = VarijableCopy.FindPerName(prijeOperacije + "");
-            var B = VarijableCopy.FindPerName(posljeOperacije + "");
+            var A = varijableCopy.FindPerName(prijeOperacije + "");
+            var B = varijableCopy.FindPerName(posljeOperacije + "");
             if (A == null || B == null)
             {
                 if (IsNumber(prijeOperacije) && IsNumber(posljeOperacije))
@@ -311,27 +306,28 @@ public class UserInputParser
                     userInputOperacije[Operacije[0].index + 1] = $"{rj}";
                     userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
                     userInputOperacije.RemoveAt(Operacije[0].index - 1);
-                    numOnly = true;
                     print = false;
+                    numOnly = true;
 
                 }
                 else if (A == null && !IsNumber(prijeOperacije) || B == null && !IsNumber(posljeOperacije))
                     throw new ArgumentException($"Jedna od varijabli nije definirana (\"{prijeOperacije} + {posljeOperacije}\")");
             }
-
-
-            if (!numOnly)
+            
+            if (!numOnly)// var-only
             {
                 Varijabla tempVar;
 
-                if (IsNumber(posljeOperacije))
+                if (IsNumber(posljeOperacije) && A != null)
                     tempVar = new Varijabla($"TMP{tempInt}", A.element * double.Parse(posljeOperacije));
-                else if (IsNumber(prijeOperacije))
+                else if (IsNumber(prijeOperacije) && B != null)
                     tempVar = new Varijabla($"TMP{tempInt}", double.Parse(prijeOperacije) * B.element);
-                else
+                else if (A != null && B != null)
                     tempVar = new Varijabla($"TMP{tempInt}", A.element * B.element);
+                else
+                    throw new ArgumentException($"Niti jedna od varijabli nije definirana (\"{prijeOperacije} + {posljeOperacije}\")");
 
-                VarijableCopy.Add(tempVar);
+                varijableCopy.Add(tempVar);
 
                 userInputOperacije[Operacije[0].index + 1] = $"TMP{tempInt}"; //Sprema ime TMP varijable za kasniju upotrebu
                 userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
@@ -353,47 +349,42 @@ public class UserInputParser
             string[] razdvajanjeNaBazuIEksponent = userInputOperacije[Operacije[0].index].Split('^');
             string prijeOperacije = razdvajanjeNaBazuIEksponent[0];
             string posljeOperacije = razdvajanjeNaBazuIEksponent[1];
-            bool numOnly = false;
 
-            if (!IsNumber(posljeOperacije) && VarijableCopy.FindPerName(posljeOperacije + "") == null)
+            if (!IsNumber(posljeOperacije) && varijableCopy.FindPerName(posljeOperacije + "") == null)
             {
                 throw new ArgumentException("Nakon znaka \"^\" mora biti broj ili ime varijable");
             }
 
-            var A = VarijableCopy.FindPerName(prijeOperacije + "");
-            var B = VarijableCopy.FindPerName(posljeOperacije + "");
+            var A = varijableCopy.FindPerName(prijeOperacije + "");
+            var B = varijableCopy.FindPerName(posljeOperacije + "");
             if (A == null || B == null)
             {
                 if (IsNumber(prijeOperacije) && IsNumber(posljeOperacije))
                 {
                     double rj;
-                    numOnly = true;
                     rj = Math.Pow(double.Parse(prijeOperacije), double.Parse(posljeOperacije));
 
                     userInputOperacije[Operacije[0].index] = $"{rj}";
                     print = false;
 
                 }
-                else if (IsNumber(posljeOperacije))
+                else if (IsNumber(posljeOperacije) && A != null)
                 {
                     Varijabla tempVar = new Varijabla($"TMP{tempInt}", Math.Pow(A.element, double.Parse(posljeOperacije)));
-                    VarijableCopy.Add(tempVar);
+                    varijableCopy.Add(tempVar);
 
                     userInputOperacije[Operacije[0].index] = $"TMP{tempInt}";
-                    numOnly = true;
                 }
-                else if (IsNumber(prijeOperacije))
+                else if (IsNumber(prijeOperacije) && B != null)
                 {
                     Varijabla tempVar = new Varijabla($"TMP{tempInt}", Math.Pow(double.Parse(prijeOperacije), B.element));
-                    VarijableCopy.Add(tempVar);
+                    varijableCopy.Add(tempVar);
 
                     userInputOperacije[Operacije[0].index] = $"TMP{tempInt}";
-                    numOnly = true;
                 }
                 else throw new ArgumentException("A^B -> A i B moraju biti brojevi ili imena varijabli");
             }
-
-            if (!numOnly)
+            else // var-only
             {
                 Varijabla tempVar;
 
@@ -401,7 +392,7 @@ public class UserInputParser
                     tempVar = new Varijabla($"TMP{tempInt}", Math.Pow(A.element, B.element));
                 }
 
-                VarijableCopy.Add(tempVar);
+                varijableCopy.Add(tempVar);
 
                 userInputOperacije[Operacije[0].index] = $"TMP{tempInt}";
             }
@@ -431,8 +422,8 @@ public class UserInputParser
             string prijeOperacije = userInputOperacije[Operacije[0].index - 1];
             string posljeOperacije = userInputOperacije[Operacije[0].index + 1];
 
-            var A = VarijableCopy.FindPerName(prijeOperacije + "");
-            var B = VarijableCopy.FindPerName(posljeOperacije + "");
+            var A = varijableCopy.FindPerName(prijeOperacije + "");
+            var B = varijableCopy.FindPerName(posljeOperacije + "");
             if (A == null || B == null)
             {
                 if (IsNumber(prijeOperacije) && IsNumber(posljeOperacije))
@@ -451,7 +442,7 @@ public class UserInputParser
                 {
                     Varijabla tempVar = new Varijabla(prijeOperacije, double.Parse(posljeOperacije));
 
-                    Varijable.Add(tempVar);
+                    varijable.Add(tempVar);
                     Operacije.RemoveAt(0);
                     return (int)returnFlagsParser.exitResultStored;
                 }
@@ -460,7 +451,7 @@ public class UserInputParser
                 else if (A == null)
                 {
                     Varijabla tempVar = new Varijabla(prijeOperacije, B.element);
-                    Varijable.Add(tempVar);
+                    varijable.Add(tempVar);
 
                     Operacije.RemoveAt(0);
                     return (int)returnFlagsParser.exitResultStored;
@@ -484,11 +475,11 @@ public class UserInputParser
                     Operacije.RemoveAt(0);
                     string imeNoveVar = A.ime;
                     if (!A.ime.Contains("TMP"))
-                        if (ReDefinirajVarijablu(A, Varijable))
+                        if (ReDefinirajVarijablu(A, varijable))
                         {
                             Varijabla Rj = new Varijabla(imeNoveVar, B.element);
-                            Varijable.Remove(A);
-                            Varijable.Add(Rj);
+                            varijable.Remove(A);
+                            varijable.Add(Rj);
                             return (int)returnFlagsParser.exitResultStored;
                         }
                     return (int)returnFlagsParser.normal;
@@ -502,7 +493,7 @@ public class UserInputParser
         int rfll = (int)returnFlagsParser.normal;
         if (Operacije.Count() > 0)
         {
-            rfll = StringToKalkulatorParser(userInput, VarijableCopy, tempInt + 1); // Return from lower layer
+            rfll = StringToKalkulatorParser(userInput, varijableCopy, tempInt + 1); // Return from lower layer
         }
 
         if ((int)returnFlagsParser.JednadzbaFalse == rfll || (int)returnFlagsParser.JednadzbaTrue == rfll) return (int)returnFlagsParser.softExit;
@@ -510,17 +501,17 @@ public class UserInputParser
 
         if (rfll == (int)returnFlagsParser.normal)
         {
-            if (VarijableCopy.Count > 0)
+            if (varijableCopy.Count > 0)
             {
-                Varijable.Add(VarijableCopy[VarijableCopy.Count - 1]);
+                varijable.Add(varijableCopy[varijableCopy.Count - 1]);
             }
         }
 
         if (rfll == (int)returnFlagsParser.exitResultStored)
         {
-            var NameColTest = Varijable.FindPerName(VarijableCopy[VarijableCopy.Count - 1].ime);
-            if (NameColTest != null) Varijable.Remove(NameColTest);
-            Varijable.Add(VarijableCopy[VarijableCopy.Count - 1]);
+            var NameColTest = varijable.FindPerName(varijableCopy[varijableCopy.Count - 1].ime);
+            if (NameColTest != null) varijable.Remove(NameColTest);
+            varijable.Add(varijableCopy[varijableCopy.Count - 1]);
         }
 
         if (IsNumber(userInput)) Console.WriteLine(userInput);
@@ -532,8 +523,8 @@ public class UserInputParser
 
         if (tempInt == 0 && !IsNumber(userInput) && print)
         {
-            Varijabla A = VarijableCopy[VarijableCopy.Count - 1];
-            if (Varijable.FindPerName(A.ime) != null)
+            Varijabla A = varijableCopy[varijableCopy.Count - 1];
+            if (varijable.FindPerName(A.ime) != null)
             {
                 Console.WriteLine($"{A.element}");
             }
@@ -545,9 +536,9 @@ public class UserInputParser
 
         if (tempInt == 0 && rfll == (int)returnFlagsParser.normal)
         {
-            if (VarijableCopy.Count > 0)
+            if (varijableCopy.Count > 0)
             {
-                Varijable.Remove(VarijableCopy[VarijableCopy.Count - 1]);
+                varijable.Remove(varijableCopy[varijableCopy.Count - 1]);
             }
         }
 
@@ -565,13 +556,13 @@ public class UserInputParser
         return prioritetOperacija;
     }
 
-    public static bool ReDefinirajVarijablu(Varijabla VarijablaKojaSeBrise, List<Varijabla> Varijable)
+    public static bool ReDefinirajVarijablu(Varijabla VarijablaKojaSeBrise, List<Varijabla> varijable)
     {
         Console.Write("\nMatrica {0} već postoji! Želite li ju redefinirati? [Y/n]: ", VarijablaKojaSeBrise.ime);
         string YNreDef = Console.ReadLine() + "";
         if (YNreDef.ToUpper() != "Y")
             return false;
-        Varijable.Remove(VarijablaKojaSeBrise);
+        varijable.Remove(VarijablaKojaSeBrise);
         return true;
     }
 
@@ -591,140 +582,6 @@ public class UserInputParser
 
         return true;
 
-    }
-}
-
-public static class CommandColor
-{
-    public static string LineColoring(string userInput, List<Varijabla> Varijable)
-    {
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.BackgroundColor = ConsoleColor.Black;
-        Console.Write("                                \r"); //Da očisti help poruku
-        if (userInput == "") Console.Write("Upiši \"?\" za pomoc\r");
-
-        (int x_pomak, int y_pomak) = Console.GetCursorPosition();
-        x_pomak = Console.CursorLeft;
-        Console.SetCursorPosition(x_pomak, y_pomak - 1);
-
-        if (userInput == "") return userInput;
-
-        Console.Write(">");
-
-        //Console.Write("\x1b[1A\r\x1b[2K\r>");
-
-        List<BojaOperacija> userInputOperandi = new List<BojaOperacija> { AddOperacija(0, "0") };
-        userInputOperandi.RemoveAt(0);
-        if (userInputOperandi.Count > 0) throw new InvalidProgramException("Prazno polje operanada nije prazno!");
-
-        string tempInput = "";
-        int brojOperanada = 0;
-
-
-        for (int i = 0; i < userInput.Length; i++)
-        {
-            tempInput += userInput[i];
-
-            if (tempInput == "+" || tempInput == "-" || tempInput == "*" || tempInput == "/" || tempInput == "^" || tempInput == "!" || tempInput == "=")
-            {
-                userInputOperandi.Add(AddOperacija((int)ConsoleColor.White, tempInput));
-                brojOperanada++;
-                tempInput = "";
-                continue;
-            }
-
-            if (tempInput == " ")
-            {
-                tempInput = "";
-                continue;
-            }
-
-            if (userInput[(i + 1) % userInput.Length] == ' ' || i == userInput.Length - 1 || char.IsAscii(userInput[(i + 1) % userInput.Length])
-                && !(char.IsLetterOrDigit(userInput[(i + 1) % userInput.Length]) || userInput[(i + 1) % userInput.Length] == '.'))
-            {
-                //Ako je ključna riječ -> obojaj u ljubičasto
-                if (tempInput.ToUpper() == UserInputParser.defineVariable || tempInput.ToUpper() == UserInputParser.helpMeni ||
-                    tempInput.ToUpper() == UserInputParser.exitFromCalc || tempInput.ToUpper() == UserInputParser.clScr ||
-                    tempInput == "?" || tempInput.ToUpper() == "ESC")
-                {
-                    userInputOperandi.Add(AddOperacija((int)ConsoleColor.Magenta, tempInput));
-                }
-                else
-                {
-                    //Ako varijabla ne postoji, ovisi o mjestu u komandi obojaj u zeleno(spremanje u novu) ili crveno(računanje s novom)
-                    var tempVar = Varijable.FindPerName(tempInput);
-                    if (tempVar == null || UserInputParser.IsNumber(tempInput))
-                        if (UserInputParser.IsNumber(tempInput))
-                            //Ako je broj -> obojaj u cyane
-                            userInputOperandi.Add(AddOperacija((int)ConsoleColor.Cyan, tempInput));
-                        else if (tempInput == userInput.Split("=")[0].Split(" ")[0])
-                            userInputOperandi.Add(AddOperacija((int)ConsoleColor.Green, tempInput));
-                        else
-                            userInputOperandi.Add(AddOperacija((int)ConsoleColor.Red, tempInput));
-                    else
-                        //Ime postojece matrice obojaj u žutu
-                        userInputOperandi.Add(AddOperacija((int)ConsoleColor.Yellow, tempInput));
-                }
-
-                brojOperanada++;
-                tempInput = "";
-            }
-
-        }
-
-        List<BojaOperacija> outputString = new List<BojaOperacija> { AddOperacija(0, "0") };
-        outputString.RemoveAt(0);
-
-        for (int i = 0; i < userInputOperandi.Count; i++)
-        {
-            if (userInputOperandi[(i + 1) % userInputOperandi.Count].operacija.Contains('^')
-                || userInputOperandi[i].operacija.Contains('^')
-                || userInputOperandi[(i + 1) % userInputOperandi.Count].operacija.Contains('!')
-                || userInputOperandi[i].operacija.Contains('!')
-                || i == userInputOperandi.Count - 1)
-                outputString.Add(userInputOperandi[i]);
-            else
-            {
-                outputString.Add(userInputOperandi[i]);
-                outputString[i] = AddOperacija(outputString[i].boja, outputString[i].operacija + " ");
-            }
-        }
-
-        for (int i = 0; i < outputString.Count; i++)
-        {
-            Console.ForegroundColor = (ConsoleColor)outputString[i].boja;
-            Console.Write(outputString[i].operacija);
-        }
-
-        int brojZnakovaOperanada = 0;
-        for (int i = 0; i < outputString.Count; i++)
-            brojZnakovaOperanada += outputString[i].operacija.Length;
-
-        Console.WriteLine(string.Empty.PadRight(Math.Abs(userInput.Length - brojZnakovaOperanada)));
-
-        string outputStringUnEscaped = "";
-        for (int i = 0; i < outputString.Count; i++)
-        {
-            outputStringUnEscaped += outputString[i].operacija;
-        }
-
-        return outputStringUnEscaped;
-
-    }
-
-    private static BojaOperacija AddOperacija(int bojaOperacije, string tekstOperacije)
-    {
-        BojaOperacija bojaOperacija;
-        bojaOperacija.boja = bojaOperacije;
-        bojaOperacija.operacija = tekstOperacije;
-
-        return bojaOperacija;
-    }
-
-    private struct BojaOperacija
-    {
-        public int boja;
-        public string operacija;
     }
 }
 
@@ -752,72 +609,5 @@ class KComparerPrioriteta : IComparer<PrioritetOperacija>
             return -1;
         else
             return 1;
-    }
-}
-
-
-public static class ChangeColor
-{
-    public static void WhiteTX(string s)
-    {
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.BackgroundColor = ConsoleColor.Black;
-        Console.Write(s);
-        Console.ResetColor();
-    }
-
-    public static void GrayTX(string s)
-    {
-        Console.ForegroundColor = ConsoleColor.Gray;
-        Console.BackgroundColor = ConsoleColor.Black;
-        Console.Write(s);
-        Console.ResetColor();
-    }
-
-    public static void RedBG(string s)
-    {
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.BackgroundColor = ConsoleColor.DarkRed;
-        Console.Write(s);
-        Console.ResetColor();
-    }
-
-    public static void RedTX(string s)
-    {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.BackgroundColor = ConsoleColor.Black;
-        Console.Write(s);
-        Console.ResetColor();
-    }
-
-    public static void GreenBG(string s)
-    {
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.BackgroundColor = ConsoleColor.DarkGreen;
-        Console.Write(s);
-        Console.ResetColor();
-    }
-
-    public static string YellowTX(string s)
-    {
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.BackgroundColor = ConsoleColor.Black;
-        Console.Write(s);
-        Console.ResetColor();
-        return "";
-    }
-
-    public static string GreenBGLine(string s)
-    {
-        GreenBG(s);
-        Console.WriteLine();
-        return "";
-    }
-
-    public static string RedBGLine(string s)
-    {
-        RedBG(s);
-        Console.WriteLine();
-        return "";
     }
 }
