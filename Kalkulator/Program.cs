@@ -54,7 +54,7 @@ internal class Kalkulator
         Thread.Sleep(500);
     }
 
-    protected static void CtrlCRukovanje(object sender, ConsoleCancelEventArgs args)
+    protected static void CtrlCRukovanje(object? sender, ConsoleCancelEventArgs args)
     {
 
         Console.WriteLine("\nProgram je prisilno zaustavljen");
