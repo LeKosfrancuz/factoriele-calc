@@ -650,7 +650,7 @@ public class UserInputParser
 
     public static bool ReDefinirajVarijablu(Varijabla VarijablaKojaSeBrise, List<Varijabla> varijable)
     {
-        Console.Write("\nMatrica {0} već postoji! Želite li ju redefinirati? [Y/n]: ", VarijablaKojaSeBrise.ime);
+        Console.Write("\nVarijabla {0} već postoji! Želite li ju redefinirati? [Y/n]: ", VarijablaKojaSeBrise.ime);
         string YNreDef = Console.ReadLine() + "";
         if (YNreDef.ToUpper() != "Y")
             return false;
