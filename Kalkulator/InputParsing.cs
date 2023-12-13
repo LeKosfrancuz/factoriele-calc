@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime;
+using FactorieleEval;
 
 namespace InputParsing;
 
@@ -41,24 +42,37 @@ public class UserInputParser
     public const string defineVariable = "DEF";
     public const string clScr = "CLS";
 
+    public const char factorieleModeRecursive = 'r';
+    public const char factorieleModeOptimized = 'o';
+    public const char factorieleModeStirling  = 's';
+
+    private static bool IsFactMode(char mode)
+    {
+        return (mode == factorieleModeRecursive) || (mode == factorieleModeOptimized)
+                || (mode == factorieleModeStirling) || (Char.IsWhiteSpace(mode));
+    }
+
     private static void PrintHelpMeni()
     {
         //Za Kalkulator
-        Console.WriteLine("\nHELP MENI ZA KALKULATOR FAKTORIELA\n\n" +
-                          "od verzije 2.5 sljedece komande su dostupne: \n\n\n" +
-                          "\"{0} [ImeVarijable]\" \n" +
-                          "\t- Kreira varijablu [ImeVarijable]\n\n" +
-                          "\"{1}\", \"?\"\n" +
-                          "\t- Pokaže ovaj meni\n\n" +
-                          "\"{2}\", \"ESC\"\n" +
-                          "\t- Izađe iz programa\n\n" +
-                          "\"{3}\" \n" +
-                          "\t- Očisti ekran\n\n",
-                          UserInputParser.defineVariable, UserInputParser.helpMeni, UserInputParser.exitFromCalc, UserInputParser.clScr);
+        Console.WriteLine("\nHELP MENI ZA KALKULATOR FAKTORIELA\n");
+        Console.WriteLine("od verzije 2.5 sljedece komande su dostupne: \n\n");
+
+        Console.WriteLine("\"{defineVariable} [ImeVarijable]\" ");
+        Console.WriteLine("\t- Kreira varijablu [ImeVarijable]\n");
+
+        Console.WriteLine("\"{helpMeni}\", \"?\"");
+        Console.WriteLine("\t- Pokaže ovaj meni\n");
+
+        Console.WriteLine("\"{exitFromCalc}\", \"ESC\"");
+        Console.WriteLine("\t- Izađe iz programa\n");
+
+        Console.WriteLine("\"{clScr}\" ");
+        Console.WriteLine("\t- Očisti ekran\n");
+
         Console.WriteLine("Operacije \"A + B\", \"A - B\", \"A * B\", \"A / B\", \"A = B\"");
         Console.WriteLine("\t- Moraju imati 2 ili više operanda npr (A = B, A + B, ...)");
         Console.WriteLine("\t- Operandi su imena varijabli i brojevi (numericke vrjednosti)");
-        //Console.WriteLine("\t- Ove operacije MORAJU se pisati sa razmakom oko njih npr (A_=_B) gdje je \"_\" razmak\n");
 
         Console.Write("Pritisni neki gumb za nastavak...");
         Console.ReadKey();
@@ -66,9 +80,15 @@ public class UserInputParser
 
         Console.WriteLine("Operacije potenciranja: \"A^B\"");
         Console.WriteLine("\t- Moraju imati 2 operanda");
-        Console.WriteLine("\t- Pišu se BEZ razmaka npr (2^3)");
         Console.WriteLine("\t- A - broj ili varijabla");
         Console.WriteLine("\t- B - broj ili varijabla\n");
+
+        Console.WriteLine("Operacije potenciranja: \"A![mode]\"");
+        Console.WriteLine("\t- mode default: o");
+        Console.WriteLine("\t- Modovi:");
+        Console.WriteLine($"\t  {factorieleModeRecursive} - evaluacija rekurzijom");
+        Console.WriteLine($"\t  {factorieleModeOptimized} - optimizirana evaluacija (trenutno koristi polja)");
+        Console.WriteLine($"\t  {factorieleModeStirling} - evaluacija Stirlingovom aproksimacijom\n");
         return;
     }
 
@@ -184,8 +204,6 @@ public class UserInputParser
                         }
                         else if (operacija.Contains('!'))
                         {
-                            ChangeColor.RedBGLine("Računanje faktorijela nije implementirano!\n");
-                            Debug.Assert(false);
                             Operacije.Add(IspuniListuPrioriteta(i, prioritetFAC, '!'));
                         }
                     }
@@ -325,7 +343,7 @@ public class UserInputParser
                 else if (A == null && !IsNumber(prijeOperacije) || B == null && !IsNumber(posljeOperacije))
                     throw new ArgumentException($"Jedna od varijabli nije definirana (\"{prijeOperacije} * {posljeOperacije}\")");
             }
-            
+
             if (!numOnly)// var-only
             {
                 Varijabla tempVar;
@@ -450,12 +468,61 @@ public class UserInputParser
                 }
                 else throw new ArgumentException("A^B -> A i B moraju biti brojevi ili imena varijabli");
             }
+        }
+        else if (Operacije[0].operacija == '!')
+        {
+            string[] operandi = userInputOperacije[Operacije[0].index].Split('!');
+            string prijeOperacije = operandi[0];
+            char mode = operandi.Length > 1 && operandi[1].Length > 0 ? operandi[1][0] : ' ';
+
+            if (!IsFactMode(mode))
+            {
+                throw new ArgumentException("Nakon znaka \"!\" mora biti metoda evaluacije ili prazno! \n"
+                                         + $" Primjer korištenja druge metode je: {prijeOperacije}!{factorieleModeStirling}. "
+                                         + $"(pogledaj {helpMeni} za bolje objašnjenje)");
+            }
+
+            Func<double, double> fact;
+
+            switch (mode)
+            {
+                case factorieleModeRecursive:
+                    {
+                        fact = FactEval.FactorieleRecursive;
+                    }
+                    break;
+                case factorieleModeStirling:
+                    {
+                        fact = FactEval.FactorieleStirling;
+                    } break;
+                case factorieleModeOptimized: /* Fallthrough */
+                default:
+                    {
+                        fact = FactEval.FactorieleOptimized;
+                    } break;
+            }
+
+            var A = varijableCopy.FindPerName(prijeOperacije + "");
+
+            if (A == null)
+            {
+                if (IsNumber(prijeOperacije))
+                {
+                    double rj;
+                    rj = fact(double.Parse(prijeOperacije));
+
+                    userInputOperacije[Operacije[0].index] = $"{rj}";
+                    print = false;
+
+                }
+                else throw new ArgumentException($"A!{mode} -> A moraja biti broj ili imene varijable");
+            }
             else // var-only
             {
                 Varijabla tempVar;
 
                 {
-                    tempVar = new Varijabla($"TMP{tempInt}", Math.Pow(A.element, B.element));
+                    tempVar = new Varijabla($"TMP{tempInt}", fact(A.element));
                 }
 
                 varijableCopy.Add(tempVar);
@@ -464,11 +531,11 @@ public class UserInputParser
             }
             userInput = "";
 
-            if (razdvajanjeNaBazuIEksponent.Length > 2)
+            if (operandi.Length > 2)
             {
-                for (int i = 2; i < razdvajanjeNaBazuIEksponent.Length; i++)
+                for (int i = 2; i < operandi.Length; i++)
                 {
-                    userInputOperacije[Operacije[0].index] += $"^{razdvajanjeNaBazuIEksponent[i]}";
+                    userInputOperacije[Operacije[0].index] += $"!{operandi[i]}";
                 }
             }
 
@@ -477,7 +544,7 @@ public class UserInputParser
                 if (i == maxIndex - 1) userInput += userInputOperacije[i];
                 else userInput += userInputOperacije[i] + " ";
             }
-            if (razdvajanjeNaBazuIEksponent.Length == 2)
+            if (operandi.Length <= 2)
             {
                 Operacije.RemoveAt(0);
             }
