@@ -58,16 +58,16 @@ public class UserInputParser
         Console.WriteLine("\nHELP MENI ZA KALKULATOR FAKTORIELA\n");
         Console.WriteLine("od verzije 2.5 sljedece komande su dostupne: \n\n");
 
-        Console.WriteLine("\"{defineVariable} [ImeVarijable]\" ");
+        Console.WriteLine($"\"{defineVariable} [ImeVarijable]\" ");
         Console.WriteLine("\t- Kreira varijablu [ImeVarijable]\n");
 
-        Console.WriteLine("\"{helpMeni}\", \"?\"");
+        Console.WriteLine($"\"{helpMeni}\", \"?\"");
         Console.WriteLine("\t- Pokaže ovaj meni\n");
 
-        Console.WriteLine("\"{exitFromCalc}\", \"ESC\"");
+        Console.WriteLine($"\"{exitFromCalc}\", \"ESC\"");
         Console.WriteLine("\t- Izađe iz programa\n");
 
-        Console.WriteLine("\"{clScr}\" ");
+        Console.WriteLine($"\"{clScr}\" ");
         Console.WriteLine("\t- Očisti ekran\n");
 
         Console.WriteLine("Operacije \"A + B\", \"A - B\", \"A * B\", \"A / B\", \"A = B\"");
