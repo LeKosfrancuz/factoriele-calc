@@ -48,7 +48,7 @@ internal class Kalkulator
         Console.WriteLine($"\nNapravili Ian Klari{cj}, Mateo Kos i Ozana Tomljanovi{cj}");
         Console.Write("Kalkulator za faktoriele ");
         
-        ChangeColor.YellowTX("v1.0");
+        ChangeColor.YellowTX("v2.5");
 
         Console.WriteLine(", Prosinac 2023.");
         Thread.Sleep(500);
