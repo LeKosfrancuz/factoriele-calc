@@ -93,7 +93,8 @@ public class UserInputParser
         Console.WriteLine($"\t  {factorieleModeBigInt} - optimizirana evaluacija za jako velike brojeve");
         Console.WriteLine($"\t  {factorieleModeStirling} - evaluacija Stirlingovom aproksimacijom\n");
         Console.WriteLine($"\"{measureTime}\" [matematički izraz za evaluirati]");
-        Console.WriteLine($"\t- Mjerenji vrijeme izvođenja matematičkog izraza (specifično funkcije operacija faktorijela)");
+        Console.WriteLine($"\t- Mjerenji vrijeme izvođenja matematičkog izraza ");
+        Console.WriteLine( "i omogućuje dodatnu statistiku(specifično funkcije operacija faktorijela)\n");
         return;
     }
 
@@ -567,6 +568,14 @@ public class UserInputParser
                 if (IsNumber(prijeOperacije))
                 {
                     userInputOperacije[Operacije[0].index] = $"{fact(double.Parse(prijeOperacije))}";
+
+                    if (mode == factorieleModeStirling && measureFactExecTime && double.Parse(prijeOperacije) <= 170)
+                    {
+                        double a = FactEval.FactorieleOptimized(double.Parse(prijeOperacije));
+                        double b = FactEval.FactorieleStirling(double.Parse(prijeOperacije));
+                        Console.WriteLine("Apsolutna greška: " + Math.Abs(b - a));
+                        Console.WriteLine("Relativna greška: " + Math.Abs(b - a) / a + "\n");
+                    }
 
                     if (double.Parse(prijeOperacije) > 170 || mode == factorieleModeBigInt)
                     {
