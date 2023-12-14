@@ -3,16 +3,37 @@
 public static class FactEval
 {
     // TODO (Ian): Implementiraj 3 vrste računanja faktorijela
-    public static double FactorieleRecursive(double a)
+    public static (double, int) FactorieleRecursive(double a)
     {
-        return 1;
+        int startTime = DateTime.Now.Millisecond;
+
+
+
+        int totalTime = DateTime.Now.Millisecond - startTime;
+
+
+        return (1, totalTime);
     }
-    public static double FactorieleOptimized(double a)
+    public static (double, int) FactorieleOptimized(double a)
     {
-        return 1;
+        int startTime = DateTime.Now.Millisecond;
+
+
+
+        int totalTime = DateTime.Now.Millisecond - startTime;
+
+
+        return (1, totalTime);
     }
-    public static double FactorieleStirling(double a)
+    public static (double, int) FactorieleStirling(double a)
     {
-        return 1;
+        int startTime = DateTime.Now.Millisecond;
+
+
+
+        int totalTime = DateTime.Now.Millisecond - startTime;
+
+
+        return (1, totalTime);
     }
 }
