@@ -528,7 +528,7 @@ public class UserInputParser
                                          + $"(pogledaj {helpMeni} za bolje objašnjenje)");
             }
 
-            Func<double, (double, int)> fact;
+            Func<double, double> fact;
 
             switch (mode)
             {
@@ -554,10 +554,8 @@ public class UserInputParser
             {
                 if (IsNumber(prijeOperacije))
                 {
-                    double rj;
-                    (rj, _) = fact(double.Parse(prijeOperacije));
-
-                    userInputOperacije[Operacije[0].index] = $"{rj}";
+                    userInputOperacije[Operacije[0].index] = $"{fact(double.Parse(prijeOperacije))}";
+                    FactEval.MessureExecTimeMs(fact, double.Parse(prijeOperacije));
                     print = false;
 
                 }
@@ -568,8 +566,7 @@ public class UserInputParser
                 Varijabla tempVar;
 
                 {
-                    double rj;
-                    (rj, _) = fact(A.element);
+                    double rj = fact(A.element);
                     tempVar = new Varijabla($"TMP{tempInt}", rj);
                 }
 

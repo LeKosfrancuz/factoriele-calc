@@ -1,55 +1,60 @@
-﻿namespace FactorieleEval;
+﻿using System.Diagnostics;
+using System.Numerics;
+
+namespace FactorieleEval;
 
 public static class FactEval
 {
     // TODO (Ian): Implementiraj 3 vrste računanja faktorijela
-    public static (double, int) FactorieleRecursive(double a)
+    public static double FactorieleRecursive(double a)
     {
-        int startTime = DateTime.Now.Millisecond;
-        int totalTime;
-
         if (a < 0) throw new ArgumentException($"Može se izračunati faktorijela samo prirodnih brojeva! {a} nije prirodan");
 
-        if (a == 0)
-        {
-            totalTime = DateTime.Now.Millisecond - startTime;
-            return (1, totalTime);
-        }
-        
-        (double b, _) = FactorieleRecursive(a - 1);
+        if (a == 0) return 1;
+        if (a > 5000) return 1;
 
-        totalTime = DateTime.Now.Millisecond - startTime;
 
-        Console.WriteLine("Vrijeme: {0}ms", totalTime);
-
-        return (a * b, totalTime);
+        return a * FactorieleRecursive(a - 1);
     }
-    public static (double, int) FactorieleOptimized(double a)
-    {
-        int startTime = DateTime.Now.Millisecond;
 
+    public static double FactorieleOptimized(double a)
+    {
         double vrijednost = 1;
-        for (int i = 2; i <= a; i++)
+        for (ulong i = 2; i <= a; i++)
         {
             vrijednost *= i;
         }
 
-        int totalTime = DateTime.Now.Millisecond - startTime;
-
-        Console.WriteLine("Vrijeme: {0}ms", totalTime);
-
-        return (vrijednost, totalTime);
+        return vrijednost;
     }
-    public static (double, int) FactorieleStirling(double a)
+
+    public static double FactorieleStirling(double a)
     {
-        int startTime = DateTime.Now.Millisecond;
 
         double b = Math.Sqrt(2 * Math.PI * a) * Math.Pow((a / Math.E), a);
 
-        int totalTime = DateTime.Now.Millisecond - startTime;
+        return b;
+    }
 
-        Console.WriteLine("Vrijeme: {0}ms", totalTime);
 
-        return (b, totalTime);
+    public static (double, double) MessureExecTimeMs(Func<double, double> fact, double a)
+    {
+        Stopwatch sw = Stopwatch.StartNew();
+
+        double factResult = 0;
+
+        int iters = 100*1000;
+        for (int i = 0; i < iters; i++)
+        {
+            factResult = fact(a);
+        }
+
+        sw.Stop();
+
+        long nanoSec = ((1000L * 1000L * 1000L) / Stopwatch.Frequency) * sw.ElapsedTicks / iters;
+
+        Console.WriteLine($"Vrijeme: {nanoSec * 1e-3:N3} μs");
+
+        return (nanoSec * 1e-6, factResult);
     }
 }
