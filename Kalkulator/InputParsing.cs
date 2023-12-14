@@ -267,9 +267,17 @@ public class UserInputParser
                     userInputOperacije.RemoveAt(Operacije[0].index - 1);
                     print = false;
                 }
-                else if (IsNumber(prijeOperacije) || IsNumber(posljeOperacije))
+                else if (IsNumber(posljeOperacije))
                 {
-                    double rj = (A == null ? double.Parse(prijeOperacije) : A.element) + (B == null ? double.Parse(posljeOperacije) : B.element);
+                    double rj = (A == null ? throw new ArgumentException($"Varijabla \"{prijeOperacije}\" nije definirana") : A.element) + double.Parse(posljeOperacije);
+                    userInputOperacije[Operacije[0].index + 1] = $"{rj}";
+                    userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
+                    userInputOperacije.RemoveAt(Operacije[0].index - 1);
+                    print = false;
+                }
+                else if (IsNumber(prijeOperacije))
+                {
+                    double rj = double.Parse(prijeOperacije) + (B == null ? throw new ArgumentException($"Varijabla \"{posljeOperacije}\" nije definirana") : B.element);
                     userInputOperacije[Operacije[0].index + 1] = $"{rj}";
                     userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
                     userInputOperacije.RemoveAt(Operacije[0].index - 1);
@@ -317,9 +325,17 @@ public class UserInputParser
                     userInputOperacije.RemoveAt(Operacije[0].index - 1);
                     print = false;
                 }
-                else if (IsNumber(prijeOperacije) || IsNumber(posljeOperacije))
+                else if (IsNumber(posljeOperacije))
                 {
-                    double rj = (A == null ? double.Parse(prijeOperacije) : A.element) - (B == null ? double.Parse(posljeOperacije) : B.element);
+                    double rj = (A == null ? throw new ArgumentException($"Varijabla \"{prijeOperacije}\" nije definirana") : A.element) - double.Parse(posljeOperacije);
+                    userInputOperacije[Operacije[0].index + 1] = $"{rj}";
+                    userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
+                    userInputOperacije.RemoveAt(Operacije[0].index - 1);
+                    print = false;
+                }
+                else if (IsNumber(prijeOperacije))
+                {
+                    double rj = double.Parse(prijeOperacije) - (B == null ? throw new ArgumentException($"Varijabla \"{posljeOperacije}\" nije definirana") : B.element);
                     userInputOperacije[Operacije[0].index + 1] = $"{rj}";
                     userInputOperacije.RemoveAt(Operacije[0].index);    //Uklanja operande i operaciju
                     userInputOperacije.RemoveAt(Operacije[0].index - 1);
