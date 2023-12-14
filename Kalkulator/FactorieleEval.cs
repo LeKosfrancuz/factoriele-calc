@@ -19,13 +19,16 @@ public static class FactEval
         (double b, _) = FactorieleRecursive(a - 1);
 
         totalTime = DateTime.Now.Millisecond - startTime;
+
+        Console.WriteLine("Vrijeme: {0}ms", totalTime);
+
         return (a * b, totalTime);
     }
     public static (double, int) FactorieleOptimized(double a)
     {
         int startTime = DateTime.Now.Millisecond;
 
-        int vrijednost = 1;
+        double vrijednost = 1;
         for (int i = 2; i <= a; i++)
         {
             vrijednost *= i;
@@ -33,6 +36,7 @@ public static class FactEval
 
         int totalTime = DateTime.Now.Millisecond - startTime;
 
+        Console.WriteLine("Vrijeme: {0}ms", totalTime);
 
         return (vrijednost, totalTime);
     }
@@ -44,6 +48,7 @@ public static class FactEval
 
         int totalTime = DateTime.Now.Millisecond - startTime;
 
+        Console.WriteLine("Vrijeme: {0}ms", totalTime);
 
         return (b, totalTime);
     }
