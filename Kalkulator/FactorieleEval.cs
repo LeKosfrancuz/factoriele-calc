@@ -61,7 +61,7 @@ public static class FactEval
 
         long nanoSec = ((1000L * 1000L * 1000L) / Stopwatch.Frequency) * sw.ElapsedTicks / iters;
 
-        Console.WriteLine($"Vrijeme: {nanoSec * 1e-3:N3} μs");
+        Console.WriteLine($"Vrijeme: {nanoSec * 1e-3:N3} µs");
 
         return (nanoSec * 1e-6, factResult);
     }
