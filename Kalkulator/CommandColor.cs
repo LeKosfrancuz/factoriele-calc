@@ -92,7 +92,7 @@ public static class CommandColor
                 //Ako je ključna riječ -> obojaj u ljubičasto
                 if (tempInput.ToUpper() == UserInputParser.defineVariable || tempInput.ToUpper() == UserInputParser.helpMeni ||
                     tempInput.ToUpper() == UserInputParser.exitFromCalc || tempInput.ToUpper() == UserInputParser.clScr ||
-                    tempInput == "?" || tempInput.ToUpper() == "ESC")
+                    tempInput == "?" || tempInput.ToUpper() == "ESC" || tempInput.ToUpper() == UserInputParser.measureTime)
                 {
                     userInputOperandi.Add(AddOperacija((int)ConsoleColor.Magenta, tempInput));
                 }

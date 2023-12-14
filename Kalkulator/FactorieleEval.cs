@@ -36,6 +36,15 @@ public static class FactEval
         return b;
     }
 
+    public static BigInteger FactorieleBigInt(double a)
+    {
+        BigInteger vrijednost = 1;
+        for (ulong i = 2; i <= a; i++)
+        {
+            vrijednost *= i;
+        }
+        return vrijednost;
+    }
 
     public static (double, double) MessureExecTimeMs(Func<double, double> fact, double a)
     {

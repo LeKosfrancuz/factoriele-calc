@@ -41,14 +41,16 @@ public class UserInputParser
     public const string helpMeni = "HELP";
     public const string defineVariable = "DEF";
     public const string clScr = "CLS";
+    public const string measureTime = "TIME";
 
     public const char factorieleModeRecursive = 'r';
     public const char factorieleModeOptimized = 'o';
     public const char factorieleModeStirling  = 's';
+    public const char factorieleModeBigInt    = 'b';
 
     public static bool IsFactMode(char mode)
     {
-        return (mode == factorieleModeRecursive) || (mode == factorieleModeOptimized)
+        return (mode == factorieleModeRecursive) || (mode == factorieleModeOptimized) || (mode == factorieleModeBigInt)
                 || (mode == factorieleModeStirling) || (Char.IsWhiteSpace(mode));
     }
 
@@ -83,12 +85,15 @@ public class UserInputParser
         Console.WriteLine("\t- A - broj ili varijabla");
         Console.WriteLine("\t- B - broj ili varijabla\n");
 
-        Console.WriteLine("Operacije potenciranja: \"A![mode]\"");
+        Console.WriteLine("Operacija faktorijel: \"A![mode]\"");
         Console.WriteLine("\t- mode default: o");
         Console.WriteLine("\t- Modovi:");
         Console.WriteLine($"\t  {factorieleModeRecursive} - evaluacija rekurzijom");
-        Console.WriteLine($"\t  {factorieleModeOptimized} - optimizirana evaluacija (trenutno koristi polja)");
+        Console.WriteLine($"\t  {factorieleModeOptimized} - optimizirana evaluacija (trenutno koristi for petlju)");
+        Console.WriteLine($"\t  {factorieleModeBigInt} - optimizirana evaluacija za jako velike brojeve");
         Console.WriteLine($"\t  {factorieleModeStirling} - evaluacija Stirlingovom aproksimacijom\n");
+        Console.WriteLine($"\"{measureTime}\" [matematički izraz za evaluirati]");
+        Console.WriteLine($"\t- Mjerenji vrijeme izvođenja matematičkog izraza (specifično funkcije operacija faktorijela)");
         return;
     }
 
@@ -102,6 +107,8 @@ public class UserInputParser
         bool print = true;
         if (userInput == null) return (int)returnFlagsParser.err;
         if (userInput.Length == 0) return (int)returnFlagsParser.err;
+
+        bool measureFactExecTime = tempInt == -1 ? true : false;
 
         switch (userInput.ToUpper())
         {
@@ -122,6 +129,11 @@ public class UserInputParser
                     return (int)returnFlagsParser.softExit;
                 }
             default: break;
+        }
+
+        if (userInput.ToUpper().StartsWith(measureTime))
+        {
+            return (int)StringToKalkulatorParser(userInput[(measureTime.Length + 1)..userInput.Length], varijable, -1);
         }
 
         int prioritetEQU = 9;
@@ -555,7 +567,16 @@ public class UserInputParser
                 if (IsNumber(prijeOperacije))
                 {
                     userInputOperacije[Operacije[0].index] = $"{fact(double.Parse(prijeOperacije))}";
-                    FactEval.MessureExecTimeMs(fact, double.Parse(prijeOperacije));
+
+                    if (double.Parse(prijeOperacije) > 170 || mode == factorieleModeBigInt)
+                    {
+                        Console.WriteLine("Full number: " + FactEval.FactorieleBigInt(double.Parse(prijeOperacije)));
+                    }
+
+                    if (measureFactExecTime)
+                    {
+                        FactEval.MessureExecTimeMs(fact, double.Parse(prijeOperacije));
+                    }
                     print = false;
 
                 }
