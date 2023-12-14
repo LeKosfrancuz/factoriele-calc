@@ -5,7 +5,6 @@ namespace FactorieleEval;
 
 public static class FactEval
 {
-    // TODO (Ian): Implementiraj 3 vrste računanja faktorijela
     public static double FactorieleRecursive(double a)
     {
         if (a < 0) throw new ArgumentException($"Može se izračunati faktorijela samo prirodnih brojeva! {a} nije prirodan");
