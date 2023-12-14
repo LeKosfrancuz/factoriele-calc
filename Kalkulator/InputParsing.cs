@@ -46,7 +46,7 @@ public class UserInputParser
     public const char factorieleModeOptimized = 'o';
     public const char factorieleModeStirling  = 's';
 
-    private static bool IsFactMode(char mode)
+    public static bool IsFactMode(char mode)
     {
         return (mode == factorieleModeRecursive) || (mode == factorieleModeOptimized)
                 || (mode == factorieleModeStirling) || (Char.IsWhiteSpace(mode));

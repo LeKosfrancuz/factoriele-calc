@@ -42,15 +42,25 @@ public static class CommandColor
                 brojOperanada++;
                 tempInput = "";
                 continue;
-            } else if (tempInput == "-")
+            } else if (tempInput == "-") // Omogući upis negativnog broja npr. 1 + -1
             {
+                if (i == 0)
+                {
+                    // micanje razmaka iz inputa
+                    int k = i + 1;
+                    if (i + 1 < userInput.Length)
+                    {
+                        while (userInput[(i + 1)..k].Replace(" ", "").Equals("") && k < userInput.Length) k++;
+                        i = k - 2;
+                    }
+                }
                 for (int j = 1; j < userInput.Length && j <= i; j++)
                 {
                     char prevOperator = userInput[i - j];
                     if (prevOperator == ' ') continue;
                     
                     if (prevOperator == '+' || prevOperator == '*' || prevOperator == '/' || prevOperator == '-' || prevOperator == '('
-                        || prevOperator == '^' || prevOperator == '!' || prevOperator == '=' || userInput[(i - j)..i].Length == 0)
+                        || prevOperator == '^' || prevOperator == '=' || userInput[(i - j)..i].Length == 0)
                     {
                         int k = i+1;
                         if (i + 1 < userInput.Length)
@@ -117,19 +127,19 @@ public static class CommandColor
 
         for (int i = 0; i < userInputOperandi.Count; i++)
         {
-            if (userInputOperandi[(i + 1) % userInputOperandi.Count].operacija.Contains('^')
+            if (i == userInputOperandi.Count - 1
+                || userInputOperandi[i + 1].operacija.Contains('^')
                 || userInputOperandi[i].operacija.Contains('^')
-                || userInputOperandi[(i + 1) % userInputOperandi.Count].operacija.Contains('!')
-                || userInputOperandi[i].operacija.Contains('!')
-                || userInputOperandi[(i + 1) % userInputOperandi.Count].operacija.Contains('(')
+                || userInputOperandi[i + 1].operacija.Contains('!')
+                || (userInputOperandi[i].operacija.Contains('!') && UserInputParser.IsFactMode(userInputOperandi[i + 1].operacija[0]))
                 || userInputOperandi[i].operacija.Contains('(')
-                || i == userInputOperandi.Count - 1)
+                || userInputOperandi[i + 1].operacija.Contains(')')
+               )
                 outputString.Add(userInputOperandi[i]);
             else
             {
                 outputString.Add(userInputOperandi[i]);
-                if (!userInputOperandi[i + 1].operacija.Contains(')'))
-                    outputString[i] = AddOperacija(outputString[i].boja, outputString[i].operacija + " ");
+                outputString[i] = AddOperacija(outputString[i].boja, outputString[i].operacija + " ");
             }
         }
 
