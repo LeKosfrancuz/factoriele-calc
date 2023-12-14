@@ -3,20 +3,23 @@
 public static class FactEval
 {
     // TODO (Ian): Implementiraj 3 vrste računanja faktorijela
-    public static double FactorieleRecursive(double a)
+    public static (double, int) FactorieleRecursive(double a)
     {
         int startTime = DateTime.Now.Millisecond;
+        int totalTime;
+
+        if (a < 0) throw new ArgumentException($"Može se izračunati faktorijela samo prirodnih brojeva! {a} nije prirodan");
 
         if (a == 0)
         {
-            int totalTime = DateTime.Now.Millisecond - startTime;
-            return 1;
+            totalTime = DateTime.Now.Millisecond - startTime;
+            return (1, totalTime);
         }
-        else
-        {
-            int totalTime = DateTime.Now.Millisecond - startTime;
-            return a * FactorieleRecursive(a - 1);
-        }
+        
+        (double b, _) = FactorieleRecursive(a - 1);
+
+        totalTime = DateTime.Now.Millisecond - startTime;
+        return (a * b, totalTime);
     }
     public static (double, int) FactorieleOptimized(double a)
     {
