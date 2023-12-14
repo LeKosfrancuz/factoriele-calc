@@ -125,17 +125,47 @@ public class UserInputParser
         }
 
         int prioritetEQU = 9;
-        int prioritetPL = 5;
+        int prioritetPL  = 5;
         int prioritetMIN = 5;
         int prioritetMUL = 4;
         int prioritetDIV = 4;
-        // TODO: Zagrade
         int prioritetFAC = 2;
         int prioritetPOT = 1;
 
 
+        while (userInput.Contains('('))
+        {
+            int first = userInput.IndexOf('(');
+            int last = userInput.LastIndexOf(')');
+
+            int zagrade = 0;
+            for (int i = first; i < last; i++)
+            {
+                if (userInput[i] == '(') zagrade++;
+                if (userInput[i] == ')') zagrade--;
+
+                if (zagrade == 0)
+                {
+                    last = i;
+                    break;
+                }
+            }
+            if (first < 0) throw new ArgumentException($"Nedostaje otvarajuća zagrada! [>(< {userInput}]");
+            if (last <= 0) throw new ArgumentException($"Nedostaje zatvarajuća zagrada! [{userInput} >)<]");
+
+            List<Varijabla> _varijableCopy = new(varijable);
+
+            UserInputParser.StringToKalkulatorParser($"__PAREN{tempInt} = " + userInput[(first + 1)..last], _varijableCopy, tempInt + 1);
+            Varijabla? result = _varijableCopy.FindPerName($"__PAREN{tempInt}");
+            if (result == null) return (int)returnFlagsParser.err;
+
+            userInput = userInput[0 .. first] + result.element.ToString() + userInput[(last + 1) .. userInput.Length];
+
+            if (userInput == "") return (int)returnFlagsParser.err;
+        }
 
         List<string> userInputOperacije = new(userInput.Split(" "));
+
         if (userInputOperacije.Count == 1 && (!userInputOperacije[0].Contains('^') && !userInputOperacije[0].Contains('!')))
         {
             if (tempInt == 0 && !IsNumber(userInput))

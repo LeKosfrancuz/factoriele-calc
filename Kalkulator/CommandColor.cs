@@ -35,7 +35,8 @@ public static class CommandColor
         {
             tempInput += userInput[i];
 
-            if (tempInput == "+" || tempInput == "*" || tempInput == "/" || tempInput == "^" || tempInput == "!" || tempInput == "=")
+            if (tempInput == "+" || tempInput == "*" || tempInput == "/" || tempInput == "^" 
+                || tempInput == "!" || tempInput == "=" || tempInput == "(" || tempInput == ")")
             {
                 userInputOperandi.Add(AddOperacija((int)ConsoleColor.White, tempInput));
                 brojOperanada++;
@@ -48,7 +49,7 @@ public static class CommandColor
                     char prevOperator = userInput[i - j];
                     if (prevOperator == ' ') continue;
                     
-                    if (prevOperator == '+' || prevOperator == '*' || prevOperator == '/' || prevOperator == '-'
+                    if (prevOperator == '+' || prevOperator == '*' || prevOperator == '/' || prevOperator == '-' || prevOperator == '('
                         || prevOperator == '^' || prevOperator == '!' || prevOperator == '=' || userInput[(i - j)..i].Length == 0)
                     {
                         int k = i+1;
@@ -120,12 +121,15 @@ public static class CommandColor
                 || userInputOperandi[i].operacija.Contains('^')
                 || userInputOperandi[(i + 1) % userInputOperandi.Count].operacija.Contains('!')
                 || userInputOperandi[i].operacija.Contains('!')
+                || userInputOperandi[(i + 1) % userInputOperandi.Count].operacija.Contains('(')
+                || userInputOperandi[i].operacija.Contains('(')
                 || i == userInputOperandi.Count - 1)
                 outputString.Add(userInputOperandi[i]);
             else
             {
                 outputString.Add(userInputOperandi[i]);
-                outputString[i] = AddOperacija(outputString[i].boja, outputString[i].operacija + " ");
+                if (!userInputOperandi[i + 1].operacija.Contains(')'))
+                    outputString[i] = AddOperacija(outputString[i].boja, outputString[i].operacija + " ");
             }
         }
 
