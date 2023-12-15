@@ -526,6 +526,36 @@ public class UserInputParser
                     userInputOperacije[Operacije[0].index] = $"TMP{tempInt}";
                 }
                 else throw new ArgumentException("A^B -> A i B moraju biti brojevi ili imena varijabli");
+            } else
+            {
+                Varijabla tempVar;
+
+                {
+                    tempVar = new Varijabla($"TMP{tempInt}", Math.Pow(A.element, B.element));
+                }
+
+                varijableCopy.Add(tempVar);
+
+                userInputOperacije[Operacije[0].index] = $"TMP{tempInt}";
+            }
+            userInput = "";
+
+            if (razdvajanjeNaBazuIEksponent.Count() > 2)
+            {
+                for (int i = 2; i < razdvajanjeNaBazuIEksponent.Count(); i++)
+                {
+                    userInputOperacije[Operacije[0].index] += $"^{razdvajanjeNaBazuIEksponent[i]}";
+                }
+            }
+
+            for (int i = 0; i < maxIndex; i++)      //Rekonstruira Input s imenima novih varijabli
+            {
+                if (i == maxIndex - 1) userInput += userInputOperacije[i];
+                else userInput += userInputOperacije[i] + " ";
+            }
+            if (razdvajanjeNaBazuIEksponent.Count() == 2)
+            {
+                Operacije.RemoveAt(0);
             }
         }
         else if (Operacije[0].operacija == '!')
